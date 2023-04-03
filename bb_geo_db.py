@@ -14,8 +14,8 @@ def findA2Link(a2LinkId):
     if a2LinkId: 
         cur.execute("select id, ST_AsGeoJSON(geometry2D) from HD_MAP hm where hdMapType = 'A2_LINK' and id = '" + a2LinkId + "';") 
     else:
-        cur.execute("select id, ST_AsGeoJSON(geometry2D) from HD_MAP hm where hdMapType = 'A2_LINK' and ST_DISTANCE(ST_GEOMFROMTEXT('POINT(332020.85 4128721.928)'), geometry2D) < 1000 order by id asc;")     
-      
+        # cur.execute("select id, ST_AsGeoJSON(geometry2D) from HD_MAP hm where hdMapType = 'A2_LINK' and ST_DISTANCE(ST_GEOMFROMTEXT('POINT(332020.85 4128721.928)'), geometry2D) < 1000 order by id asc;")
+        cur.execute("select id, ST_AsGeoJSON(geometry2D) from HD_MAP hm where (hdMapType = 'A2_LINK') and (JSON_VALUE(properties, '$.roadNo') = '1') and (ST_DISTANCE(ST_GEOMFROMTEXT('POINT(332020.85 4128721.928)'), geometry2D) < 1000)  order by id asc;")
  
     a2linkList = []
     for id, geometry in cur :

@@ -33,8 +33,8 @@ def convert_geojson_to_folium(tuple):
 
 ## main ##
 
-# a2linkList = findA2Link()
-a2linkList = findA2Link("A217BR720009")
+a2linkList = findA2Link("")
+# a2linkList = findA2Link("A217BR720009")
 # print (a2linkList)
 
 geo_xy = create_feature_collection(a2linkList)
