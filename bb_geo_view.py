@@ -20,7 +20,7 @@ def create_feature_collection(a2LinkList):
         feature = Feature(properties=property, geometry=geometry, id=id)
         feature_list.append(feature)
     
-    print(feature_list)   
+    # print(feature_list)   
     feature_collection = FeatureCollection(feature_list)
 
     return feature_collection
@@ -33,17 +33,20 @@ def convert_geojson_to_folium(tuple):
 
 ## main ##
 
-a2linkList = findA2Link()
-print (a2linkList)
+# a2linkList = findA2Link()
+a2linkList = findA2Link("A217BR720009")
+# print (a2linkList)
 
 geo_xy = create_feature_collection(a2linkList)
 geo_latlon = geojson.utils.map_tuples(convert_geojson_to_folium, geo_xy)
 
 m = folium.Map(
     location=UTM52N_To_LatLon(332020.85, 4128721.928), # 신갈 JC
-    zoom_start=14,
+    zoom_start=17,
     tiles=""
 )
+
+### A2 LINK Layer
 
 style_function = lambda x: {
     "color": "#3388ff"
@@ -52,22 +55,24 @@ style_function = lambda x: {
 folium.GeoJson(
     data=geo_latlon,
     style_function=style_function,
-    name='bamboos',
+    name='A2_LINK',
     overlay=True
 ).add_to(m)
 
 
+### A7 LINK SLICE Layer
+
 style_function_other = lambda x: {
-    "color": "#FF0000"
+    "color": "#FF0000" if int(x["properties"]["indexInA2Link"])%2 == 0 else "#00FF00"
 }
 
-geo_other = geojson.utils.map_coords(lambda x: x, geo_latlon)
-# geo_other = geo_latlon
+geo_a7slice_xyz = geojson.loads(open("./a7slice.geojson", 'r').read())
+geo_a7slice_latlon = geojson.utils.map_tuples(convert_geojson_to_folium, geo_a7slice_xyz)
 
 folium.GeoJson(
-    data=geo_other,
+    data=geo_a7slice_latlon,
     style_function=style_function_other,
-    name="other",
+    name="A7_LINK_SLICE",
     overlay=True
 ).add_to(m)
 
