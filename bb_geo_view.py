@@ -3,7 +3,7 @@ import json
 import geojson
 
 from bb_geo_tran import UTM52N_To_LatLon
-from bb_geo_db import findA2Link
+from bb_geo_db import findA2Link, findA7LinkSlice
 from geojson import MultiLineString, Feature, FeatureCollection
 
 
@@ -13,12 +13,15 @@ from geojson import MultiLineString, Feature, FeatureCollection
 
 def create_feature_collection(a2LinkList):
     feature_list = []
+    index = 1
     for a2Link in a2LinkList:
         id = a2Link['id']
         geometry = a2Link['geometry']
-        property = {"id": id}
+        property = {"id": id, "index": index}
         feature = Feature(properties=property, geometry=geometry, id=id)
         feature_list.append(feature)
+
+        index = index + 1
     
     # print(feature_list)   
     feature_collection = FeatureCollection(feature_list)
@@ -49,7 +52,7 @@ m = folium.Map(
 ### A2 LINK Layer
 
 style_function = lambda x: {
-    "color": "#3388ff"
+    "color": "#3388ff" if int(x["properties"]["index"])%2 == 0 else "#80B5FF"
 }
 
 folium.GeoJson(
@@ -62,11 +65,15 @@ folium.GeoJson(
 
 ### A7 LINK SLICE Layer
 
+a7LinkSliceList = findA7LinkSlice("")
+
 style_function_other = lambda x: {
-    "color": "#FF0000" if int(x["properties"]["indexInA2Link"])%2 == 0 else "#00FF00"
+    #"color": "#FF0000" if int(x["properties"]["indexInA2Link"])%2 == 0 else "#00FF00"
+    "color": "#FF0000" if int(x["properties"]["index"])%2 == 0 else "#00FF00"
 }
 
-geo_a7slice_xyz = geojson.loads(open("./a7slice.geojson", 'r').read())
+# geo_a7slice_xyz = geojson.loads(open("./a7slice_youngin_4km.geojson", 'r').read())
+geo_a7slice_xyz = create_feature_collection(a7LinkSliceList)
 geo_a7slice_latlon = geojson.utils.map_tuples(convert_geojson_to_folium, geo_a7slice_xyz)
 
 folium.GeoJson(
