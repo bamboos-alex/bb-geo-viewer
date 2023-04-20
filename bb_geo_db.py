@@ -1,5 +1,6 @@
 import mariadb
 import geojson
+import json
 
 def findA2Link(a2LinkId):
     conn = mariadb.connect(
@@ -12,24 +13,25 @@ def findA2Link(a2LinkId):
     cur = conn.cursor()
     
     if a2LinkId: 
-        cur.execute("select id, ST_AsGeoJSON(geometry2D) from HD_MAP hm where hdMapType = 'A2_LINK' and id = '" + a2LinkId + "';") 
+        cur.execute("select id, properties, ST_AsGeoJSON(geometry2D) from HD_MAP hm where hdMapType = 'A2_LINK' and id = '" + a2LinkId + "';") 
     else:
-        cur.execute("select id, ST_AsGeoJSON(geometry2D) from HD_MAP hm where hdMapType = 'A2_LINK' and ST_DISTANCE(ST_GEOMFROMTEXT('POINT(332020.85 4128721.928)'), geometry2D) < 10000 order by id asc;")
+        cur.execute("select id, properties, ST_AsGeoJSON(geometry2D) from HD_MAP hm where hdMapType = 'A2_LINK' and ST_DISTANCE(ST_GEOMFROMTEXT('POINT(332020.85 4128721.928)'), geometry2D) < 10000 order by id asc;")
         # cur.execute("select id, ST_AsGeoJSON(geometry2D) from HD_MAP hm where (hdMapType = 'A2_LINK') and (JSON_VALUE(properties, '$.roadNo') = '1') and (ST_DISTANCE(ST_GEOMFROMTEXT('POINT(332020.85 4128721.928)'), geometry2D) < 1000)  order by id asc;")
  
-    a2linkList = []
-    for id, geometry in cur :
-        #print(f"id={id}, geometry={geometry}")   
+    linkList = []
+    for id, properties, geometry in cur :
+        print(f"id={id}, properties={properties}, geometry={geometry}")
 
+        prop = json.loads(properties)
         geo = geojson.loads(geometry)
          
-        a2link = {"id": id, "geometry": geo}
-        a2linkList.append(a2link)
+        link = {"id": id, "properties": prop, "geometry": geo}
+        linkList.append(link)
         
     
     conn.close()
 
-    return a2linkList
+    return linkList
     
     
 # a2Link = findA2Link()
@@ -47,25 +49,27 @@ def findA7LinkSlice(a7Id):
     cur = conn.cursor()
     
     if a7Id: 
-        cur.execute("select id, ST_AsGeoJSON(geometry2D) from HD_MAP hm where hdMapType = 'A7_LINK_SLICE' and id = '" + a7Id + "';") 
+        cur.execute("select id, properties, ST_AsGeoJSON(geometry2D) from HD_MAP hm where hdMapType = 'A7_LINK_SLICE' and id = '" + a7Id + "';") 
     else:
-        cur.execute("select id, ST_AsGeoJSON(geometry2D) from HD_MAP hm where hdMapType = 'A7_LINK_SLICE' order by id asc;") 
+        cur.execute("select id, properties, ST_AsGeoJSON(geometry2D) from HD_MAP hm where hdMapType = 'A7_LINK_SLICE' order by id asc;") 
         #cur.execute("select id, ST_AsGeoJSON(geometry2D) from HD_MAP hm where hdMapType = 'A7_LINK_SLICE' and ST_DISTANCE(ST_GEOMFROMTEXT('POINT(332020.85 4128721.928)'), geometry2D) < 10000 order by id asc;")
         # cur.execute("select id, ST_AsGeoJSON(geometry2D) from HD_MAP hm where (hdMapType = 'A7_LINK_SLICE') and (JSON_VALUE(properties, '$.roadNo') = '1') and (ST_DISTANCE(ST_GEOMFROMTEXT('POINT(332020.85 4128721.928)'), geometry2D) < 1000)  order by id asc;")
  
-    a7linkList = []
-    for id, geometry in cur :
-        #print(f"id={id}, geometry={geometry}")   
+    linkList = []
+    for id, properties, geometry in cur :
+        print(f"id={id}, properties={properties}, geometry={geometry}")   
 
+        prop = json.loads(properties)
         geo = geojson.loads(geometry)
+        
          
-        a7link = {"id": id, "geometry": geo}
-        a7linkList.append(a7link)
+        link = {"id": id, "properties": prop, "geometry": geo}
+        linkList.append(link)
         
     
     conn.close()
 
-    return a7linkList
+    return linkList
     
     
 # a7Link = findA7LinkSlice("")

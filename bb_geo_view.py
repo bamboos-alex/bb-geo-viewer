@@ -16,13 +16,15 @@ def create_feature_collection(a2LinkList):
     index = 1
     for a2Link in a2LinkList:
         id = a2Link['id']
+        properties = a2Link['properties']
+        properties['index'] = index
         geometry = a2Link['geometry']
-        property = {"id": id, "index": index}
-        feature = Feature(properties=property, geometry=geometry, id=id)
+
+        feature = Feature(properties=properties, geometry=geometry, id=id)
         feature_list.append(feature)
 
         index = index + 1
-    
+
     # print(feature_list)   
     feature_collection = FeatureCollection(feature_list)
 
@@ -54,33 +56,60 @@ m = folium.Map(
 style_function = lambda x: {
     "color": "#3388ff" if int(x["properties"]["index"])%2 == 0 else "#80B5FF"
 }
+tooltip = folium.GeoJsonTooltip(fields=['id', 'roadType', 'roadNo', 'direction', 'laneNo', 'maxSpeed', 'length','roadRank','linkType',  'fromNodeId', 'toNodeId',  'index'])
 
 folium.GeoJson(
     data=geo_latlon,
     style_function=style_function,
     name='A2_LINK',
-    overlay=True
+    overlay=True,
+    tooltip=tooltip
 ).add_to(m)
 
 
 ### A7 LINK SLICE Layer
 
 a7LinkSliceList = findA7LinkSlice("")
+# a7LinkSliceList = findA7LinkSlice("A219AG640002_A7000001")
 
-style_function_other = lambda x: {
-    #"color": "#FF0000" if int(x["properties"]["indexInA2Link"])%2 == 0 else "#00FF00"
-    "color": "#FF0000" if int(x["properties"]["index"])%2 == 0 else "#00FF00"
-}
+# style_function_other = lambda x: {
+#     #"color": "#FF0000" if int(x["properties"]["indexInA2Link"])%2 == 0 else "#00FF00"
+#     "color": "#FF0000" if int(x["properties"]["index"])%2 == 0 else "#00FF00"
+# }
+
+
+def style_function_other(x):
+    color = "#FF0000"
+
+    a7_prop = x["properties"]
+
+    
+    print (a7_prop)
+    
+    if (a7_prop["roadType"] == "MAIN_ROAD") :
+        if (a7_prop["index"] % 2 == 0):
+            color = "#66CDAA"
+        else:
+            color = "#D3FFCE"
+    else:
+        if (a7_prop["index"] % 2 == 0):
+            color = "#FA8072" 
+        else:
+            color = "#B74160"
+
+    return {"color": color}
 
 # geo_a7slice_xyz = geojson.loads(open("./a7slice_youngin_4km.geojson", 'r').read())
 geo_a7slice_xyz = create_feature_collection(a7LinkSliceList)
 geo_a7slice_latlon = geojson.utils.map_tuples(convert_geojson_to_folium, geo_a7slice_xyz)
+geo_tooltip = folium.GeoJsonTooltip(fields=['id', 'roadType','roadNo', 'direction', 'laneNo', 'maxSpeed','length', 'prev', 'next', 'a2LinkId',  'indexInA2Link',  'minRow', 'maxRow',  'minColumn',  'maxColumn', 'index'])
 
 folium.GeoJson(
     data=geo_a7slice_latlon,
     style_function=style_function_other,
     name="A7_LINK_SLICE",
-    overlay=True
+    overlay=True,
+    tooltip=geo_tooltip
 ).add_to(m)
 
 folium.LayerControl().add_to(m)
