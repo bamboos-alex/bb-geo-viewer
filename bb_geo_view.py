@@ -3,7 +3,7 @@ import json
 import geojson
 
 from bb_geo_tran import UTM52N_To_LatLon
-from bb_geo_db import findLink
+from bb_geo_db import find
 from geojson import MultiLineString, Feature, FeatureCollection
 
 
@@ -60,10 +60,10 @@ roadNo_100_Direction_S = {"roadNo": "100", "direction": "S"}
 
 a2Reuqset = {"hdMapType": "A2_LINK"}
 a2Reuqset.update(roadNo_1)
-a2LinkList_1 = findLink(request=a2Reuqset)
+a2LinkList_1 = find(request=a2Reuqset)
 
 a2Reuqset.update(roadNo_50)
-a2LinkList_50 = findLink(request=a2Reuqset)
+a2LinkList_50 = find(request=a2Reuqset)
 
 # a2LinkList_1_E = findA2Link(request=roadNo_1_Direction_E)
 # a2LinkList_1_S = findA2Link(request=roadNo_1_Direction_S)
@@ -117,9 +117,9 @@ folium.GeoJson(
 ### A7 LINK SLICE Layer
 a7Request = {"hdMapType": "A7_LINK_SLICE"}
 a7Request.update(roadNo_1)
-a7LinkList_1 = findLink(request=a7Request)
+a7LinkList_1 = find(request=a7Request)
 a7Request.update(roadNo_50)
-a7LinkList_50 = findLink(request=a7Request)
+a7LinkList_50 = find(request=a7Request)
 # a7LinkList_50_E = findA7Link(request=roadNo_50_Direction_E)
 # a7LinkList_50_S = findA7Link(request=roadNo_50_Direction_S)
 # a7LinkList_1_E = findA7Link(request=roadNo_1_Direction_E)
