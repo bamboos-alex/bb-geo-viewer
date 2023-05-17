@@ -7,7 +7,7 @@ from bb_geo_db import find, find_manual_sql
 from geojson import MultiLineString, Feature, FeatureCollection
 from folium import Marker
 
-flag_with_bg = False
+flag_with_bg = True
 
 if (flag_with_bg) :
     HTML_FILE_NAME='bb-map-bg-pangyo.html'
@@ -80,11 +80,23 @@ def style_function_a2(x):
     color = "#3388ff"
     a2_prop = x["properties"]
     if (a2_prop["linkType"] == "1") :
-        color = "#990b11"
+        if (a2_prop["index"] % 2 == 0):
+            color = "#bec8b9" 
+        else:
+            color = "#dfd6cd"
     elif (a2_prop["linkType"] == "4"):
         color = "#00cc99"
+        if (a2_prop["index"] % 2 == 0):
+            color = "#ec33ec" 
+        else:
+            color = "#ff97d1"
+
     elif (a2_prop["linkType"] == "6"):
-        color = "#3b2f2f"
+        if (a2_prop["index"] % 2 == 0):
+            color = "#1034a6" 
+        else:
+            color = "#0779bf"
+
     else:
         color = "#fbbcec"
         
@@ -100,7 +112,7 @@ popup = folium.GeoJsonPopup(fields=a2_fields)
 folium.GeoJson(
     data=geo_latlon,
     style_function=style_function_a2,
-    name='A2_LINK_Pangyo',
+    name='A2_LINK',
     overlay=True,
     tooltip=tooltip,
     popup=popup
@@ -108,76 +120,77 @@ folium.GeoJson(
 
 
 ### A7 LINK SLICE Layer
-# a7Request_1 = {"hdMapType": "A7_LINK_SLICE"}
-# a7Request_1.update(roadNo_1)
-# a7LinkList_1 = find(request=a7Request_1)
+a7Request = {"hdMapType": "A7_LINK_SLICE"}
+a7LinkList = find(request=a7Request)
 
-# print("#############################################")
-# print(a7LinkList_1);
-# print("#############################################")
+print("#############################################")
+print(a7LinkList);
+print("#############################################")
 
-# def style_function_other(x):
-#     color = "#FF0000"
+def style_function_other(x):
+    color = "#FF0000"
 
-#     a7_prop = x["properties"]
+    a7_prop = x["properties"]
 
     
-#     #print (a7_prop)
+    #print (a7_prop)
     
-#     if (a7_prop["roadType"] == "MAIN_ROAD") :
+    if (a7_prop["roadType"] == "MAIN_ROAD") :
 
-#         if (a7_prop["length"] == 100):        
-#             if (a7_prop["index"] % 2 == 0):
-#                 color = "#66CDAA"
-#             else:
-#                 color = "#BADA55"
-#         else:
-#             if (a7_prop["index"] % 2 == 0):
-#                 color = "#B6FCD5"
-#             else:
-#                 color = "#D3FFCE"
+        if (a7_prop["length"] == 100):        
+            if (a7_prop["index"] % 2 == 0):
+                color = "#66CDAA"
+            else:
+                color = "#BADA55"
+        else:
+            if (a7_prop["index"] % 2 == 0):
+                color = "#B6FCD5"
+            else:
+                color = "#D3FFCE"
             
-#     else:
-#         if (a7_prop["index"] % 2 == 0):
-#             color = "#FA8072" 
-#         else:
-#             color = "#B74160"
+    elif (a7_prop["roadType"] == "RAMP"):
+        if (a7_prop["index"] % 2 == 0):
+            color = "#FA8072" 
+        else:
+            color = "#B74160"
+    else:
+        if (a7_prop["index"] % 2 == 0):
+            color = "#edb3eb" 
+        else:
+            color = "#ec33ec"
+    
+    if (a7_prop["linkType"] == "1") :
+        if (a7_prop["index"] % 2 == 0):
+            color = "#990b11" 
+        else:
+            color = "#caacaf"
+ 
+    if (a7_prop["linkType"] == "4"):
+        if (a7_prop["index"] % 2 == 0):
+            color = "#00cc99" 
+        else:
+            color = "#2eb561"
+ 
 
-#     return {"color": color}
+    return {"color": color}
 
 
-# a7_fields=['id', 'roadType','roadNo', 'direction', 'laneNo', 'maxSpeed','length', 'prev', 'next', 'a2LinkId',  'indexInA2Link',  'minRow', 'maxRow',  'minColumn',  'maxColumn', 'index']
-# geo_tooltip_1 = folium.GeoJsonTooltip(fields=a7_fields)
-# geo_popup_1 = folium.GeoJsonPopup(fields=a7_fields)
+a7_fields=['id', 'roadType','roadNo', 'direction', 'laneNo', 'maxSpeed','length','roadRank','linkType',  'prev', 'next', 'a2LinkId',  'indexInA2Link',  'minRow', 'maxRow',  'minColumn',  'maxColumn', 'index']
+geo_tooltip = folium.GeoJsonTooltip(fields=a7_fields)
+geo_popup = folium.GeoJsonPopup(fields=a7_fields)
+
+geo_a7slice_xyz = create_feature_collection(a7LinkList)
+geo_a7slice_latlon = geojson.utils.map_tuples(convert_geojson_to_folium, geo_a7slice_xyz)
 
 
-# geo_tooltip_50 = folium.GeoJsonTooltip(fields=a7_fields)
-# geo_popup_50 = folium.GeoJsonPopup(fields=a7_fields)
-
-# geo_a7slice_xyz_1 = create_feature_collection(a7LinkList_1)
-# geo_a7slice_latlon_1 = geojson.utils.map_tuples(convert_geojson_to_folium, geo_a7slice_xyz_1)
-
-# geo_a7slice_xyz_50 = create_feature_collection(a7LinkList_50)
-# geo_a7slice_latlon_50 = geojson.utils.map_tuples(convert_geojson_to_folium, geo_a7slice_xyz_50)
-
-# folium.GeoJson(
-#     data=geo_a7slice_latlon_1,
-#     style_function=style_function_other,
-#     name="A7_LINK_SLICE_RoadNo_1",
-#     overlay=True,
-#     tooltip=geo_tooltip_1,
-#     popup=geo_popup_1
-# ).add_to(m)
-
-# folium.GeoJson(
-#     data=geo_a7slice_latlon_50,
-#     style_function=style_function_other,
-#     name="A7_LINK_SLICE_RoadNo_50",
-#     overlay=True,
-#     tooltip=geo_tooltip_50,
-#     popup=geo_popup_50
-# ).add_to(m)
-
+folium.GeoJson(
+    data=geo_a7slice_latlon,
+    style_function=style_function_other,
+    name="A7_LINK_SLICE",
+    overlay=True,
+    tooltip=geo_tooltip,
+    popup=geo_popup
+).add_to(m)
 
 folium.LayerControl(position='topright', collapsed=False).add_to(m)
 
