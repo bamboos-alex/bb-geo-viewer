@@ -13,25 +13,26 @@ def find(request):
     cur = conn.cursor()
 
     if (isinstance(request, dict)):
-        roadNo = request['roadNo']
-        direction = request['direction']
         hdMapType = request['hdMapType']
 
-        if (not roadNo):
-             cur.execute("select id, properties, ST_AsGeoJSON(geometry2D) from HD_MAP hm where hdMapType = '" + hdMapType + "' "
-            + " and JSON_VALUE(properties, \"$.roadNo\") IS NULL order by id asc;") 
-        elif (direction) :
-            cur.execute("select id, properties, ST_AsGeoJSON(geometry2D) from HD_MAP hm where hdMapType = '" + hdMapType + "' "
-            + " and JSON_VALUE(properties, \"$.roadNo\") = '" + roadNo + "' "
-            + " and JSON_VALUE(properties, \"$.direction\") = '" + direction + "' order by id asc;") 
-        else :
-            cur.execute("select id, properties, ST_AsGeoJSON(geometry2D) from HD_MAP hm where hdMapType = '" + hdMapType + "' "
-            + " and JSON_VALUE(properties, \"$.roadNo\") = '" + roadNo + "' order by id asc;") 
+        if (request.get('roadNo')):
+            if (request.get('direction')) :
+                roadNo = request['roadNo']
+                direction = request['direction']
+                cur.execute("select id, properties, ST_AsGeoJSON(geometry2D) from HD_MAP hm where hdMapType = '" + hdMapType + "' "
+                + " and JSON_VALUE(properties, \"$.roadNo\") = '" + roadNo + "' "
+                + " and JSON_VALUE(properties, \"$.direction\") = '" + direction + "' order by id asc;") 
+            else :
+                roadNo = request['roadNo']
+                cur.execute("select id, properties, ST_AsGeoJSON(geometry2D) from HD_MAP hm where hdMapType = '" + hdMapType + "' "
+                + " and JSON_VALUE(properties, \"$.roadNo\") = '" + roadNo + "' order by id asc;") 
+        else:
+            cur.execute("select id, properties, ST_AsGeoJSON(geometry2D) from HD_MAP hm where hdMapType = '" + hdMapType + "' order by id asc;") 
     elif request : 
         id = request
-        cur.execute("select id, properties, ST_AsGeoJSON(geometry2D) from HD_MAP hm where hdMapType = '" + hdMapType +  "' and id = '" + id + "';") 
+        cur.execute("select id, properties, ST_AsGeoJSON(geometry2D) from HD_MAP hm where id = '" + id + "';") 
     else:
-        cur.execute("select id, properties, ST_AsGeoJSON(geometry2D) from HD_MAP hm where hdMapType = '" + hdMapType + "' order by id asc;") 
+        cur.execute("select id, properties, ST_AsGeoJSON(geometry2D) from HD_MAP hm where hdMapType = 'A2_LINK' order by id asc;") 
  
     linkList = []
     for id, properties, geometry in cur :
