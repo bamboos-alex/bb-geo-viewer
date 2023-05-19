@@ -3,28 +3,35 @@ import json
 import geojson
 
 from bb_geo_tran import UTM52N_To_LatLon
-from bb_geo_db import find, find_manual_sql
+from bb_geo_db import find, find_manual_sql, find_by_point
 from geojson import MultiLineString, Feature, FeatureCollection
 from folium import Marker
 
-flag_with_bg = True
+
+meter = 2000 # meter
+INIT_POINT = (332967.7981256369, 4141269.55194718) # 판교테크노중앙 사거리
+
+flag_with_bg = False
+pre_fix='a7'
+#post_fix='road-rank-not-1'
+post_fix=''
 
 if (flag_with_bg) :
-    HTML_FILE_NAME='bb-map-bg-pangyo.html'
+    HTML_FILE_NAME='bb-map-bg-' + pre_fix + '-pangyo-' + str(meter) + '-meter' + post_fix + '.html'
 else :
-    HTML_FILE_NAME='bb-map-pangyo.html'
+    HTML_FILE_NAME='bb-map-' + pre_fix + '-pangyo-' + str(meter) + '-meter' + post_fix + '.html'
 
 # main ##
 
 if (flag_with_bg) :
     m = folium.Map(
-        location=UTM52N_To_LatLon(332967.7981256369, 4141269.55194718), # 판교테크노중앙 사거리
+        location=UTM52N_To_LatLon(INIT_POINT[0], INIT_POINT[1]),
         zoom_start=15,
         tiles="OpenStreetMap"
     )
 else :
     m = folium.Map(
-        location=UTM52N_To_LatLon(332967.7981256369, 4141269.55194718), # 판교테크노중앙 사거리
+        location=UTM52N_To_LatLon(INIT_POINT[0], INIT_POINT[1]),
         zoom_start=15,
         tiles=""
     )
@@ -45,6 +52,11 @@ def create_feature_collection(linkList):
         if ('direction' not in properties):
             properties['direction'] = 'NULL'
 
+            
+        # filtering temporary
+#        if (properties['roadRank'] == '1'):
+#            continue
+
         feature = Feature(properties=properties, geometry=geometry, id=id)
         feature_list.append(feature)
 
@@ -64,7 +76,8 @@ def convert_geojson_to_folium(tuple):
 ## A2 Link
 
 a2Request = {'hdMapType': "A2_LINK"}
-a2LinkList = find(a2Request)
+a2Request = {"hdMapType" : "A2_LINK", "x" : INIT_POINT[0], "y": INIT_POINT[1], "meter": meter}
+a2LinkList = find_by_point(a2Request)
 
 print("#############################################")
 print (a2LinkList)
@@ -120,8 +133,9 @@ folium.GeoJson(
 
 
 ### A7 LINK SLICE Layer
-a7Request = {"hdMapType": "A7_LINK_SLICE"}
-a7LinkList = find(request=a7Request)
+
+request = {"hdMapType" : "A7_LINK_SLICE", "x" : INIT_POINT[0], "y": INIT_POINT[1], "meter": meter}
+a7LinkList = find_by_point(request)
 
 print("#############################################")
 print(a7LinkList);
@@ -134,8 +148,12 @@ def style_function_other(x):
 
     
     #print (a7_prop)
+
+    if (not a7_prop.get('roadLocationType')):
+        print("no roadLocationType")
+        return {"color": color}
     
-    if (a7_prop["roadType"] == "MAIN_ROAD") :
+    if (a7_prop["roadLocationType"] == "MAIN_ROAD") :
 
         if (a7_prop["length"] == 100):        
             if (a7_prop["index"] % 2 == 0):
@@ -148,7 +166,7 @@ def style_function_other(x):
             else:
                 color = "#D3FFCE"
             
-    elif (a7_prop["roadType"] == "RAMP"):
+    elif (a7_prop["roadLocationType"] == "RAMP"):
         if (a7_prop["index"] % 2 == 0):
             color = "#FA8072" 
         else:
@@ -175,7 +193,7 @@ def style_function_other(x):
     return {"color": color}
 
 
-a7_fields=['id', 'roadType','roadNo', 'direction', 'laneNo', 'maxSpeed','length','roadRank','linkType',  'prev', 'next', 'a2LinkId',  'indexInA2Link',  'minRow', 'maxRow',  'minColumn',  'maxColumn', 'index']
+a7_fields=['id', 'roadLocationType','roadNo', 'direction', 'laneNo', 'maxSpeed','length','roadRank','linkType',  'prev', 'next', 'a2LinkId',  'indexInA2Link',  'minRow', 'maxRow',  'minColumn',  'maxColumn', 'index']
 geo_tooltip = folium.GeoJsonTooltip(fields=a7_fields)
 geo_popup = folium.GeoJsonPopup(fields=a7_fields)
 
