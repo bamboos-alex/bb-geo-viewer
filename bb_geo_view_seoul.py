@@ -8,13 +8,14 @@ from geojson import MultiLineString, Feature, FeatureCollection
 from folium import Marker
 
 
-meter = 3000 # meter
+meter = 1000 # meter
+INIT_POINT = (324241.45472746145, 4152474.830050004) # 서초구립 반포도서관 사거리 127.011596 37.502491
 #INIT_POINT = (313732.3108338943, 4161109.817388392) # 상암동 사거리 126.890584 37.578210
-INIT_POINT = (316605.046633, 4155231.821346) # 여의대로 126.9245642 37.5259637
+#INIT_POINT = (316605.046633, 4155231.821346) # 여의대로 126.9245642 37.5259637
 
-flag_with_bg = False
+flag_with_bg = True
 pre_fix='a7'
-name='yeouido'
+name='seocho'
 #post_fix='road-rank-not-1'
 post_fix=''
 
@@ -25,16 +26,17 @@ else :
 
 # main ##
 
+zoom_start=18
 if (flag_with_bg) :
     m = folium.Map(
         location=UTM52N_To_LatLon(INIT_POINT[0], INIT_POINT[1]),
-        zoom_start=15,
+        zoom_start=zoom_start,
         tiles="OpenStreetMap"
     )
 else :
     m = folium.Map(
         location=UTM52N_To_LatLon(INIT_POINT[0], INIT_POINT[1]),
-        zoom_start=15,
+        zoom_start=zoom_start,
         tiles=""
     )
 
@@ -120,7 +122,8 @@ def style_function_a2(x):
     return {"color": color}
 
 
-a2_fields=['id', 'roadType', 'roadNo', 'direction', 'laneNo', 'maxSpeed', 'length','roadRank','linkType',  'fromNodeId', 'toNodeId',  'index']
+#a2_fields=['id', 'roadType', 'roadNo', 'direction', 'laneNo', 'maxSpeed', 'length', 'roadRank','linkType',  'fromNodeId', 'toNodeId',  'index']
+a2_fields=['id', 'roadType', 'roadNo', 'direction', 'laneNo', 'length', 'roadRank','linkType',  'fromNodeId', 'toNodeId',  'index']
 
 tooltip = folium.GeoJsonTooltip(fields=a2_fields)
 popup = folium.GeoJsonPopup(fields=a2_fields)
@@ -196,7 +199,8 @@ def style_function_other(x):
     return {"color": color}
 
 
-a7_fields=['id', 'roadLocationType','roadNo', 'direction', 'laneNo', 'maxSpeed','length','roadRank','linkType',  'prev', 'next', 'a2LinkId',  'indexInA2Link',  'minRow', 'maxRow',  'minColumn',  'maxColumn', 'index']
+#a7_fields=['id', 'roadLocationType','roadNo', 'direction', 'laneNo', 'maxSpeed','length', 'roadRank','linkType',  'prev', 'next', 'a2LinkId',  'indexInA2Link',  'minRow', 'maxRow',  'minColumn',  'maxColumn', 'index']
+a7_fields=['id', 'roadLocationType','roadNo', 'direction', 'laneNo', 'length','roadRank', 'linkType',  'prev', 'next', 'a2LinkId',  'indexInA2Link',  'minRow', 'maxRow',  'minColumn',  'maxColumn', 'index']
 geo_tooltip = folium.GeoJsonTooltip(fields=a7_fields)
 geo_popup = folium.GeoJsonPopup(fields=a7_fields)
 
