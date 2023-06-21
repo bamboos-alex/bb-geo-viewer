@@ -8,7 +8,7 @@ from geojson import MultiLineString, Feature, FeatureCollection
 from folium import Marker
 
 
-meter = 1000 # meter
+meter = 5000 # meter
 INIT_POINT = (324241.45472746145, 4152474.830050004) # 서초구립 반포도서관 사거리 127.011596 37.502491
 #INIT_POINT = (313732.3108338943, 4161109.817388392) # 상암동 사거리 126.890584 37.578210
 #INIT_POINT = (316605.046633, 4155231.821346) # 여의대로 126.9245642 37.5259637
@@ -22,7 +22,7 @@ post_fix=''
 if (flag_with_bg) :
     HTML_FILE_NAME='bb-map-bg-' + pre_fix + '-' + name + '-' + str(meter) + '-meter' + post_fix + '.html'
 else :
-    HTML_FILE_NAME='bb-map-' + pre_fix + '-' + name + ' -' + str(meter) + '-meter' + post_fix + '.html'
+    HTML_FILE_NAME='bb-map-' + pre_fix + '-' + name + '-' + str(meter) + '-meter' + post_fix + '.html'
 
 # main ##
 

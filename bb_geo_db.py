@@ -2,11 +2,14 @@ import mariadb
 import geojson
 import json
 
+
+DB_HOST="127.0.0.1"
+
 def find(request):
     conn = mariadb.connect(
         user="ldm",
         password="ldm",
-        host="127.0.0.1",
+        host=DB_HOST,
         database="next-ldm"
     )
     
@@ -50,6 +53,34 @@ def find(request):
 
     return linkList
     
+def find_by_hdmaptype(hdmaptype):
+    conn = mariadb.connect(
+        user="ldm",
+        password="ldm",
+        host=DB_HOST,
+        database="next-ldm"
+    )
+    
+    cur = conn.cursor()
+
+    cur.execute("select id, properties, ST_AsGeoJSON(geometry2D) from HD_MAP hm where hdMapType = '" + hdmaptype + "' order by id asc;")
+
+    linkList = []
+    for id, properties, geometry in cur :
+        print(f"id={id}, properties={properties}, geometry={geometry}")   
+
+        prop = json.loads(properties)
+        geo = geojson.loads(geometry)
+        
+         
+        link = {"id": id, "properties": prop, "geometry": geo}
+        linkList.append(link)
+        
+    
+    conn.close()
+
+    return linkList
+
 
 def find_manual_sql():
     conn = mariadb.connect(
@@ -83,7 +114,7 @@ def find_by_point(request):
     conn = mariadb.connect(
         user="ldm",
         password="ldm",
-        host="127.0.0.1",
+        host=DB_HOST,
         database="next-ldm"
     )
     
@@ -118,6 +149,6 @@ def find_by_point(request):
 
 
 ### test ####   
-# request = {"hdMapType" : "A7_LINK_SLICE", "x" : 332967.7981256369, "y": 4141269.55194718, "meter": 2000}
-# points = find_by_point(request)
-# print (points)
+#request = {"hdMapType" : "A7_LINK_SLICE", "x" : 332967.7981256369, "y": 4141269.55194718, "meter": 2000}
+#points = find_by_point(request)
+#print (points)
